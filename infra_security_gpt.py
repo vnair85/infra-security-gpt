@@ -35,6 +35,37 @@ class ITInfraSecurityLeadGPT:
             "✅ Enforce MFA and conditional access policies."
         ]
 
+    def handle_incident(self, incident_type: str) -> str:
+        if incident_type == "Data Breach":
+            return (
+                "### 🛡️ Incident Response: Data Breach\n"
+                "1. 🛑 **Isolate affected systems immediately**\n"
+                "2. 🔍 **Identify breach source and impacted data**\n"
+                "3. 📢 **Notify legal, compliance, and stakeholders**\n"
+                "4. 🔐 **Change credentials and block compromised access**\n"
+                "5. 📄 **Document the breach and lessons learned**\n"
+            )
+        elif incident_type == "Ransomware Attack":
+            return (
+                "### 🛡️ Incident Response: Ransomware\n"
+                "1. 🚫 **Disconnect infected systems from the network**\n"
+                "2. 🔒 **Check backups and avoid paying ransom**\n"
+                "3. 🧼 **Wipe & restore affected systems from clean backups**\n"
+                "4. 🚨 **Report incident to regulatory body if required**\n"
+                "5. 📊 **Review security gaps and update tools**\n"
+            )
+        elif incident_type == "Insider Threat":
+            return (
+                "### 🛡️ Incident Response: Insider Threat\n"
+                "1. 🧠 **Identify suspicious user behavior or access**\n"
+                "2. 🔍 **Audit logs and collect evidence securely**\n"
+                "3. 🗣️ **Interview involved parties confidentially**\n"
+                "4. 🧑‍⚖️ **Suspend access and begin HR/legal procedures**\n"
+                "5. 📁 **Update IAM policies and monitoring alerts**\n"
+            )
+        else:
+            return "🚫 Unsupported incident type."
+
 # --- UI Layout ---
 st.set_page_config(page_title="IT Infra & Security Advisor", page_icon="🛡️")
 
@@ -46,7 +77,8 @@ with st.sidebar:
         "Cloud Migration Strategy",
         "Active Directory Rebuild Plan",
         "GRC Audit Checklist",
-        "IAM Guide"
+        "IAM Guide",
+        "Incident Response Simulator"
     ])
 
 st.markdown("""
@@ -58,7 +90,7 @@ st.markdown("""
 
 st.title("🛡️ IT Infra & Security Advisor (by Vicknes Nair)")
 st.markdown("""
-This interactive tool reflects 18+ years of real-world IT experience across Azure, infrastructure security, GRC audits, and IAM.
+This interactive tool reflects 18+ years of real-world IT experience across Azure, infrastructure security, GRC audits, IAM, and incident response planning.
 Select your area of guidance and input the necessary details to receive practical recommendations.
 """)
 
@@ -91,3 +123,9 @@ elif tab == "IAM Guide":
         iam_steps = engine.get_iam_guide()
         for step in iam_steps:
             st.markdown(f"- {step}")
+
+elif tab == "Incident Response Simulator":
+    st.subheader("🧪 Incident Response Simulator")
+    incident_type = st.selectbox("Select Incident Type", ["Data Breach", "Ransomware Attack", "Insider Threat"])
+    if st.button("Simulate Response"):
+        st.markdown(engine.handle_incident(incident_type))
