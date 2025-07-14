@@ -50,6 +50,33 @@ fig = px.bar(risk_df, x="Risk Area", y="Severity", color="Severity",
              color_continuous_scale="reds", title="Top 5 Infra Weaknesses for Your Organization")
 st.plotly_chart(fig, use_container_width=True)
 
+# --- SECTION 3: ISO Compliance Progress
+st.subheader("🛡️ Compliance Readiness Tracker")
+iso_27001 = 0.55
+iso_20000 = 0.45
+
+# Adjust based on company size and environment
+if company_size == "Large":
+    iso_27001 += 0.15
+    iso_20000 += 0.1
+elif company_size == "Medium":
+    iso_27001 += 0.05
+    iso_20000 += 0.05
+
+if environment == "Cloud":
+    iso_27001 += 0.1
+if environment == "Hybrid":
+    iso_27001 += 0.05
+    iso_20000 += 0.05
+
+col5, col6 = st.columns(2)
+with col5:
+    st.markdown(f"**ISO/IEC 27001 Readiness: {int(iso_27001 * 100)}%**")
+    st.progress(iso_27001)
+with col6:
+    st.markdown(f"**ISO/IEC 20000-1 Readiness: {int(iso_20000 * 100)}%**")
+    st.progress(iso_20000)
+
 # Footer
 st.markdown("---")
 st.caption("Designed by Vicknes Nair | Infra Self-Assessment Tool | Version 1.0")
