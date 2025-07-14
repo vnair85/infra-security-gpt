@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from io import BytesIO
+import base64
 
 st.set_page_config(page_title="IT Infra Public Dashboard", layout="wide")
 
@@ -28,7 +30,6 @@ st.markdown("---")
 # --- SECTION 2: Risk Dashboard Generator
 st.subheader("🔴 Tailored Risk Heatmap")
 
-# Basic logic to vary risk severity based on selections
 risk_matrix = {
     "Small": [5, 6, 4, 3, 6],
     "Medium": [6, 7, 5, 4, 7],
@@ -38,10 +39,9 @@ risk_matrix = {
 labels = ["Legacy OS", "IAM Gaps", "Backup Failures", "Firewall Misconfig", "Insufficient Visibility"]
 severity = risk_matrix.get(company_size, [5, 6, 5, 4, 6])
 
-# Slight modifiers based on environment
 if environment == "Cloud":
-    severity[0] -= 2  # Less legacy OS
-    severity[4] += 1  # Visibility harder in cloud
+    severity[0] -= 2
+    severity[4] += 1
 elif environment == "Hybrid":
     severity[4] += 2
 
@@ -55,7 +55,6 @@ st.subheader("🛡️ Compliance Readiness Tracker")
 iso_27001 = 0.55
 iso_20000 = 0.45
 
-# Adjust based on company size and environment
 if company_size == "Large":
     iso_27001 += 0.15
     iso_20000 += 0.1
@@ -92,6 +91,37 @@ with st.expander("Click to view your tailored GRC checklist"):
     for item, status in checklist.items():
         st.checkbox(item, value=status, disabled=True)
 
-# Footer
+# --- SECTION 5: Download Report
+st.subheader("📄 Download Self-Assessment Summary")
+
+def create_summary():
+    summary = f"""
+    IT Infrastructure Self-Assessment Summary\n\n
+    Organization Profile:\n
+    - Company Size: {company_size}\n    - Industry: {industry}\n    - Environment: {environment}\n    - Region: {region}\n\n
+    ISO 27001 Readiness: {int(iso_27001 * 100)}%\n    ISO 20000 Readiness: {int(iso_20000 * 100)}%\n\n
+    Top Risks:\n    """
+    for i in range(len(labels)):
+        summary += f"- {labels[i]}: {severity[i]}/10\n"
+
+    summary += "\nGRC Checklist:\n"
+    for item, status in checklist.items():
+        state = "✔️" if status else "❌"
+        summary += f"- {state} {item}\n"
+
+    return summary
+
+def download_button():
+    content = create_summary()
+    b = BytesIO()
+    b.write(content.encode())
+    b.seek(0)
+    b64 = base64.b64encode(b.read()).decode()
+    href = f'<a href="data:file/txt;base64,{b64}" download="infra_self_assessment.txt">📥 Download Report (.txt)</a>'
+    return href
+
+st.markdown(download_button(), unsafe_allow_html=True)
+
+# --- Footer
 st.markdown("---")
 st.caption("Designed by Vicknes Nair | Infra Self-Assessment Tool | Version 1.0")
