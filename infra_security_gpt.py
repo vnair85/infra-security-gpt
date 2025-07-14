@@ -37,24 +37,30 @@ checklist = {}
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
+    st.success("✅ File uploaded and assessed successfully.")
+
+    st.subheader("📄 Uploaded Data Preview")
+    st.dataframe(df, use_container_width=True)
+
     total_controls = len(df)
     compliant = df[df["Status"] == "Compliant"].shape[0]
     partial = df[df["Status"] == "Partially Compliant"].shape[0]
+    non_compliant = df[df["Status"] == "Non-Compliant"].shape[0]
     evidence = df[df["Evidence Available"] == "Yes"].shape[0]
 
-    # Simple scoring logic
     iso_27001_score = round(((compliant + 0.5 * partial) / total_controls), 2)
     iso_20000_score = round((evidence / total_controls), 2)
 
-    # Generate checklist from data
     checklist = dict(zip(df["Control Name"], df["Status"] == "Compliant"))
 
-    st.success("✅ File uploaded and assessed successfully.")
-else:
-    st.info("Please upload a CSV file to assess compliance readiness.")
+    # Summary block
+    st.subheader("🔍 Compliance Summary")
+    colc1, colc2, colc3 = st.columns(3)
+    colc1.metric("✔️ Compliant", compliant)
+    colc2.metric("➖ Partial", partial)
+    colc3.metric("❌ Non-Compliant", non_compliant)
 
-# --- SECTION 3: ISO Compliance Progress
-if uploaded_file:
+    # --- SECTION 3: ISO Compliance Progress
     st.subheader("🛡️ Compliance Readiness Tracker")
     col5, col6 = st.columns(2)
     with col5:
@@ -64,16 +70,14 @@ if uploaded_file:
         st.markdown(f"**ISO/IEC 20000-1 Readiness: {int(iso_20000_score * 100)}%**")
         st.progress(iso_20000_score)
 
-# --- SECTION 4: GRC Checklist
-if checklist:
+    # --- SECTION 4: GRC Checklist
     st.subheader("✅ GRC Readiness Checklist")
     with st.expander("Click to view your tailored GRC checklist"):
         for item, status in checklist.items():
             st.checkbox(item, value=status, disabled=True)
 
-# --- SECTION 5: Download Report
-if uploaded_file:
-    st.subheader("📄 Download Self-Assessment Summary")
+    # --- SECTION 5: Download Report
+    st.subheader("📥 Download Self-Assessment Summary")
 
     def create_summary():
         summary = f"""
@@ -99,6 +103,9 @@ if uploaded_file:
 
     st.markdown(download_button(), unsafe_allow_html=True)
 
+else:
+    st.info("Please upload a CSV file to assess compliance readiness.")
+
 # --- Footer
 st.markdown("---")
-st.caption("Designed by Vicknes Nair | Infra Self-Assessment Tool | Version 2.0")
+st.caption("Designed by Vicknes Nair | Infra Self-Assessment Tool | Version 2.1")
