@@ -6,7 +6,7 @@ class NetworkInfrastructureAdvisor:
         if network_type == "Small Office / Branch Office":
             return (
                 "### 🧩 Recommended Setup for Small Office\n"
-                "1. **Use a Unified Threat Management (UTM) device**\n"
+                "1. **[Use a Unified Threat Management (UTM) device](#utm-guide)**\n"
                 "   - Combines firewall, antivirus, content filtering, and IDS/IPS into one appliance.\n"
                 "   - Ideal for small teams without a dedicated security team.\n"
                 "2. **VPN-enabled router with VLAN segmentation**\n"
@@ -22,49 +22,30 @@ class NetworkInfrastructureAdvisor:
                 "   - Provides centralized visibility and control via a web console.\n"
                 "   - Layer 3 switching can also handle routing if needed."
             )
-
-        elif network_type == "Enterprise Campus Network":
-            return (
-                "### 🏢 Recommended Setup for Enterprise Campus\n"
-                "1. **Core-Distribution-Access Layer Topology**\n"
-                "   - Ensures scalability and modularity.\n"
-                "   - Access layer handles user connectivity, distribution aggregates switches, and core manages high-speed traffic.\n"
-                "2. **Redundant Core Switches with OSPF/BGP**\n"
-                "   - Offers failover and load balancing capabilities.\n"
-                "   - OSPF is preferred for internal routing; BGP for external.\n"
-                "3. **NAC (Network Access Control) Integration**\n"
-                "   - Verifies user identity and endpoint compliance before granting access.\n"
-                "   - Can integrate with AD, RADIUS, or 802.1X.\n"
-                "4. **Firewalls between internal zones and internet edge**\n"
-                "   - Implements security segmentation (e.g., HR zone, Finance zone).\n"
-                "   - Controls East-West and North-South traffic.\n"
-                "5. **SD-WAN for Branch Site Integration**\n"
-                "   - Offers better performance and flexibility over traditional MPLS.\n"
-                "   - Centralized controller can define traffic policies."
-            )
-
-        elif network_type == "Cloud-Hybrid Environment":
-            return (
-                "### ☁️ Hybrid Network Setup\n"
-                "1. **Site-to-site VPN or ExpressRoute (Azure)**\n"
-                "   - Connects on-premises networks with cloud data centers securely.\n"
-                "   - ExpressRoute provides private connection with low latency.\n"
-                "2. **Hub-and-Spoke Architecture for Segmentation**\n"
-                "   - Central hub VNet manages connectivity and security.\n"
-                "   - Spoke VNets for specific workloads (e.g., dev, prod).\n"
-                "3. **Use NSGs and Azure Firewall for Traffic Control**\n"
-                "   - NSGs manage traffic rules at subnet or NIC level.\n"
-                "   - Azure Firewall inspects and logs network traffic.\n"
-                "4. **Enforce Routing Tables and DNS Forwarding**\n"
-                "   - Custom route tables help control traffic flow between subnets.\n"
-                "   - Forward DNS requests to on-prem DNS if hybrid.\n"
-                "5. **Integrate with On-Prem AD/LDAP Securely**\n"
-                "   - Use Azure AD Connect with password hash sync or pass-through auth.\n"
-                "   - Deploy AD DS in Azure if full hybrid is needed."
-            )
-
         else:
             return "❗ Please select a valid network type."
+
+    def get_utm_guide(self):
+        return (
+            "### 🛠️ How to Set Up a UTM Device\n"
+            "1. **Choose a UTM Appliance**\n"
+            "   - Common options: FortiGate, Sophos XG, pfSense (open source).\n"
+            "2. **Connect Hardware**\n"
+            "   - WAN port to ISP modem/router.\n"
+            "   - LAN port to switch or internal network.\n"
+            "3. **Access Web GUI**\n"
+            "   - Default IP usually 192.168.1.1\n"
+            "   - Login with default credentials, then change password.\n"
+            "4. **Run Initial Wizard**\n"
+            "   - Set timezone, hostname, internal IP range.\n"
+            "   - Enable DHCP if needed.\n"
+            "5. **Configure Firewall Rules**\n"
+            "   - Allow internal → internet, block external → internal.\n"
+            "6. **Enable Additional Services**\n"
+            "   - Enable IPS, antivirus, web filtering based on licensing.\n"
+            "7. **Save & Monitor Logs**\n"
+            "   - Enable email alerts and syslog integration."
+        )
 
 # --- Streamlit UI ---
 st.set_page_config(page_title="Network Infra Advisor", page_icon="🧩")
@@ -84,4 +65,9 @@ network_type = st.selectbox("Select your network environment:", [
 ])
 
 if st.button("Get Recommendations"):
-    st.markdown(advisor.get_network_guidance(network_type))
+    st.markdown(advisor.get_network_guidance(network_type), unsafe_allow_html=True)
+
+# Expandable guide for Point 1 (UTM Device)
+st.markdown("---")
+with st.expander("📘 Click here to learn how to set up a UTM device (Point 1)"):
+    st.markdown(advisor.get_utm_guide())
