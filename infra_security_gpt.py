@@ -77,6 +77,21 @@ with col6:
     st.markdown(f"**ISO/IEC 20000-1 Readiness: {int(iso_20000 * 100)}%**")
     st.progress(iso_20000)
 
+# --- SECTION 4: GRC Checklist
+st.subheader("✅ GRC Readiness Checklist")
+checklist = {
+    "Asset Inventory Documented": True,
+    "IAM Joiner-Mover-Leaver Process": company_size != "Small",
+    "Patch Management Program Active": True,
+    "Vulnerability Scan (Last 30 Days)": company_size != "Small",
+    "Disaster Recovery Test Completed": environment != "On-Prem",
+    "MFA Enforced for Admin Access": True
+}
+
+with st.expander("Click to view your tailored GRC checklist"):
+    for item, status in checklist.items():
+        st.checkbox(item, value=status, disabled=True)
+
 # Footer
 st.markdown("---")
 st.caption("Designed by Vicknes Nair | Infra Self-Assessment Tool | Version 1.0")
