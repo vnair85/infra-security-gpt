@@ -25,8 +25,30 @@ region = col4.selectbox("Region", ["APAC", "EU", "North America", "Global"])
 
 st.markdown("---")
 
-# Placeholder message for next phase
-st.info("✅ Profile saved. Click next to generate your tailored risk insights and compliance overview.")
+# --- SECTION 2: Risk Dashboard Generator
+st.subheader("🔴 Tailored Risk Heatmap")
+
+# Basic logic to vary risk severity based on selections
+risk_matrix = {
+    "Small": [5, 6, 4, 3, 6],
+    "Medium": [6, 7, 5, 4, 7],
+    "Large": [8, 9, 7, 6, 8]
+}
+
+labels = ["Legacy OS", "IAM Gaps", "Backup Failures", "Firewall Misconfig", "Insufficient Visibility"]
+severity = risk_matrix.get(company_size, [5, 6, 5, 4, 6])
+
+# Slight modifiers based on environment
+if environment == "Cloud":
+    severity[0] -= 2  # Less legacy OS
+    severity[4] += 1  # Visibility harder in cloud
+elif environment == "Hybrid":
+    severity[4] += 2
+
+risk_df = pd.DataFrame({"Risk Area": labels, "Severity": severity})
+fig = px.bar(risk_df, x="Risk Area", y="Severity", color="Severity",
+             color_continuous_scale="reds", title="Top 5 Infra Weaknesses for Your Organization")
+st.plotly_chart(fig, use_container_width=True)
 
 # Footer
 st.markdown("---")
